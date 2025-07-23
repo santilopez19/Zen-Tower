@@ -1,0 +1,34 @@
+#  Torre Zen 🏗️✨
+
+Un juego hipercasual, minimalista y relajante sobre construir la torre más alta posible. Hecho con Unity como mi primer proyecto para la Play Store.
+
+
+
+---
+## Acerca del Juego
+
+**Torre Zen** es una experiencia de juego zen. El objetivo es simple: tocar la pantalla en el momento justo para apilar bloques uno encima del otro. Una colocación perfecta mantiene el tamaño del bloque, mientras que un error lo hace más pequeño, aumentando la dificultad. ¿Qué tan alto puedes llegar?
+
+---
+## Características
+
+* **Controles de un toque:** Fácil de aprender, difícil de dominar.
+* **Diseño minimalista:** Una interfaz limpia y una paleta de colores que evoluciona a medida que la torre crece.
+* **Física satisfactoria:** La torre puede tambalearse, ¡pero la hemos estabilizado para una jugabilidad justa!
+* **Sonido y Música:** Efectos de sonido suaves y una banda sonora lo-fi para máxima concentración.
+* **Recompensa Final:** Al perder, la cámara se aleja para mostrarte la magnitud de tu creación.
+
+---
+## Tecnologías Usadas
+
+* **Motor de Juego:** Unity 2022.x
+* **Lenguaje:** C#
+* **Control de Versiones:** Git y GitHub
+
+---
+## Cómo Jugar
+
+1.  Un bloque se mueve de izquierda a derecha en la parte superior.
+2.  Toca la pantalla para soltarlo sobre la torre.
+3.  ¡Intenta alinear los bloques perfectamente para obtener puntos extra y no reducir tu base!
+4.  El juego termina cuando fallas al colocar un bloque.
