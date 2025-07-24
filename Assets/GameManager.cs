@@ -1,5 +1,9 @@
 using UnityEngine;
 using System.Collections; // Necesario para las Corutinas
+using UnityEngine.UI; // NUEVO: Necesario para controlar elementos de UI como el botón
+using TMPro;
+using UnityEngine.SceneManagement; // Para cambiar de escena
+using UnityEngine.Audio; 
 
 public class GameManager : MonoBehaviour
 {
@@ -18,11 +22,26 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float cameraFollowSpeed = 5f;
 
        // NUEVO: Reorganizamos los sonidos para más claridad
-    [Header("Clips de Audio")]
-    [SerializeField] private AudioClip musicLoop;      // Música de fondo
-    [SerializeField] private AudioClip placeSound;     // Sonido de colocación normal
-    [SerializeField] private AudioClip perfectSound;   // Sonido de colocación perfecta
-    [SerializeField] private AudioClip gameOverSound; // Sonido de fin de juego
+
+    [Header("Audio")]
+    [SerializeField] private AudioMixer mainMixer;
+    [SerializeField] private AudioSource musicSource;
+    [SerializeField] private AudioSource sfxSource;
+    [SerializeField] private AudioClip placeSound;
+    [SerializeField] private AudioClip perfectSound;
+    [SerializeField] private AudioClip gameOverSound;
+    [SerializeField] private AudioClip musicLoop;  // Sonido de fin de juego
+
+    // NUEVO: Variables para la UI que faltaban
+    [Header("UI Elements")]
+    [SerializeField] private GameObject pausePanel;
+    [SerializeField] private TextMeshProUGUI scoreText;
+    [SerializeField] private Button pauseButton;
+    [SerializeField] private Button resumeButton;
+    [SerializeField] private Button restartButton;
+    [SerializeField] private Button exitButton;
+    [SerializeField] private Slider musicSlider;
+    [SerializeField] private Slider sfxSlider;
 
     // VARIABLES PRIVADAS (Para uso interno del script)
     private GameObject currentBlock;    // El bloque que el jugador está controlando actualmente.
@@ -37,6 +56,8 @@ public class GameManager : MonoBehaviour
 
     // Puntuación (Según el GDD)
     private int score = 0;
+
+    private bool isPaused = false; // NUEVO: Para saber si el juego está en pausa
     
     // NUEVO: Una variable para recordar cuál fue el primer bloque (el suelo).
     private Transform firstBlock;
@@ -44,6 +65,17 @@ public class GameManager : MonoBehaviour
     // Se ejecuta una sola vez cuando el juego empieza.
         void Start()
     {
+        // --- Conectar Listeners de la UI ---
+        pauseButton.onClick.AddListener(TogglePause);
+        resumeButton.onClick.AddListener(TogglePause);
+        restartButton.onClick.AddListener(RestartGame);
+        exitButton.onClick.AddListener(ExitToMenu);
+        musicSlider.onValueChanged.AddListener(SetMusicVolume);
+        sfxSlider.onValueChanged.AddListener(SetSfxVolume);
+        
+        // --- Inicialización ---
+        pausePanel.SetActive(false); // Ocultamos el panel al inicio
+        Time.timeScale = 1f; // Nos aseguramos de que el tiempo corra normal
 
         // NUEVO: Guardamos una referencia al suelo como el primer bloque de la torre.
         firstBlock = lastBlock;
@@ -64,30 +96,30 @@ public class GameManager : MonoBehaviour
         }
         
         SpawnBlock();
+        // NUEVO: Actualizamos el texto del puntaje al inicio.
+        UpdateScoreText();
     }
 
     // Se ejecuta en cada frame.
     void Update()
     {
-        // Si el juego ha terminado, no hacemos nada.
-        if (gameOver)
-        {
-            return;
-        }
+        if (gameOver || isPaused) return;
 
-        // Si hay un bloque en movimiento, lo movemos.
-        if (blockIsMoving)
-        {
-            MoveBlock();
-        }
+        if (blockIsMoving) MoveBlock();
 
-        // Si el jugador hace clic (o toca la pantalla).
+        // --- ¡AQUÍ ESTÁ LA CORRECCIÓN! ---
         if (Input.GetMouseButtonDown(0))
         {
+            // Verificamos si el puntero (mouse o dedo) está sobre un objeto de la UI.
+            if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+            {
+                // Si lo está, no hacemos nada y salimos de la función.
+                return;
+            }
+
+            // Si el toque NO fue sobre la UI, entonces sí colocamos el bloque.
             PlaceBlock();
         }
-         // NUEVO: En cada frame, movemos suavemente la cámara hacia su posición objetivo.
-        // La cámara sigue al jugador solo si el juego NO ha terminado.
         if (mainCamera != null && !gameOver)
         {
             mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, cameraTargetPosition, Time.deltaTime * cameraFollowSpeed);
@@ -177,15 +209,18 @@ public class GameManager : MonoBehaviour
             score += 5;
             Debug.Log("¡Perfecto! Puntuación: " + score);
             // NUEVO: Reproducimos el sonido de colocación perfecta.
-            if (perfectSound != null) audioSource.PlayOneShot(perfectSound);
+            if (perfectSound != null) sfxSource.PlayOneShot(perfectSound);
         }
         else
         {
             score += 1;
             Debug.Log("Puntuación: " + score);
             // NUEVO: Reproducimos el sonido de colocación normal.
-            if (placeSound != null) audioSource.PlayOneShot(placeSound);
+            if (placeSound != null) sfxSource.PlayOneShot(placeSound);
         }
+
+        // NUEVO: Llamamos a la función para actualizar la UI en lugar de usar Debug.Log
+        UpdateScoreText();
         
         // El bloque actual se convierte en el "último bloque" para la siguiente ronda.
         lastBlock = currentBlock.transform;
@@ -211,13 +246,21 @@ public class GameManager : MonoBehaviour
         if (gameOver) return; // Evita que se ejecute múltiples veces
 
         gameOver = true;
+
+        pauseButton.gameObject.SetActive(false);
         Debug.Log("¡GAME OVER! Puntuación Final: " + score);
+
+        // NUEVO: Desactivamos el botón de pausa cuando el juego termina.
+        if (pauseButton != null)
+        {
+            pauseButton.gameObject.SetActive(false);
+        }
 
         // NUEVO: Reproducir el sonido de Game Over
         if (gameOverSound != null)
         {
-            audioSource.Stop(); // Detenemos la música de fondo
-            audioSource.PlayOneShot(gameOverSound); // Reproducimos el sonido de fin de juego
+            musicSource.Stop(); // Detenemos la música de fondo
+            sfxSource.PlayOneShot(gameOverSound); // Reproducimos el sonido de fin de juego
         }
         // NUEVO: Iniciamos la animación de la cámara.
         StartCoroutine(ZoomOutOnGameOver());
@@ -262,4 +305,48 @@ public class GameManager : MonoBehaviour
         mainCamera.orthographicSize = targetOrthoSize;
     }
 
+    // NUEVO: Función para pausar y reanudar el juego.
+    public void TogglePause()
+    {
+        Debug.Log("Función TogglePause EJECUTADA. El estado de isPaused ahora es: " + !isPaused);
+
+        isPaused = !isPaused; // Invierte el estado de pausa
+
+       
+        pausePanel.SetActive(isPaused);
+        Time.timeScale = isPaused ? 0f : 1f;
+    }
+
+    // NUEVO: Una función dedicada a actualizar el texto del puntaje.
+    void UpdateScoreText()
+    {
+        if (scoreText != null)
+        {
+            scoreText.text = "Score: " + score;
+        }
+    }
+
+    public void RestartGame()
+    {
+        Time.timeScale = 1f; // Importante reanudar el tiempo antes de cargar
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+
+    public void ExitToMenu()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("MainMenuScene");
+    }
+
+    public void SetMusicVolume(float volume)
+    {
+        // Convertimos el valor lineal del slider (0.0001 a 1) a decibelios (logarítmico)
+        mainMixer.SetFloat("MusicVolume", Mathf.Log10(volume) * 20);
+    }
+
+    public void SetSfxVolume(float volume)
+    {
+        mainMixer.SetFloat("SfxVolume", Mathf.Log10(volume) * 20);
+    }
 }
