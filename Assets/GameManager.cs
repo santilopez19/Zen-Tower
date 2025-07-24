@@ -7,6 +7,12 @@ using UnityEngine.Audio;
 
 public class GameManager : MonoBehaviour
 {
+    // NUEVO: Variables para el panel de Game Over
+    [Header("Game Over UI")]
+    [SerializeField] private GameObject gameOverPanel;
+    [SerializeField] private TextMeshProUGUI finalScoreText;
+    [SerializeField] private Button gameOverRestartButton;
+    [SerializeField] private Button gameOverExitButton;
     // VARIABLES PÚBLICAS (Para conectar en el editor de Unity)
     [Header("Configuración de Juego")]
     [SerializeField] private GameObject blockPrefab;    // El prefab del bloque que creamos.
@@ -73,6 +79,12 @@ public class GameManager : MonoBehaviour
         musicSlider.onValueChanged.AddListener(SetMusicVolume);
         sfxSlider.onValueChanged.AddListener(SetSfxVolume);
         
+        // NUEVO: Conectamos los botones del panel de Game Over
+        gameOverRestartButton.onClick.AddListener(RestartGame);
+        gameOverExitButton.onClick.AddListener(ExitToMenu);
+
+
+        gameOverPanel.SetActive(false);
         // --- Inicialización ---
         pausePanel.SetActive(false); // Ocultamos el panel al inicio
         Time.timeScale = 1f; // Nos aseguramos de que el tiempo corra normal
@@ -262,15 +274,29 @@ public class GameManager : MonoBehaviour
             musicSource.Stop(); // Detenemos la música de fondo
             sfxSource.PlayOneShot(gameOverSound); // Reproducimos el sonido de fin de juego
         }
-        // NUEVO: Iniciamos la animación de la cámara.
-        StartCoroutine(ZoomOutOnGameOver());
+
+
+        // --- NUEVO: Lógica para mostrar el panel de Game Over ---
+        // Actualizamos el texto del puntaje final en el panel
+        if (finalScoreText != null)
+        {
+            finalScoreText.text = "Score: " + score;
+        }
+        // Activamos el panel
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(true);
+        }
+        SavePlayerScore();
+        // Iniciamos la corutina que maneja la animación y la aparición del panel
+        StartCoroutine(GameOverSequence());
     }
 
 
     // NUEVO: Corutina completa para animar la cámara al final del juego.
     IEnumerator ZoomOutOnGameOver()
     {
-        float duration = 2.5f; // Duración de la animación de zoom en segundos.
+        float duration = 2.0f; // La animación durará 2 segundos
         float elapsedTime = 0f;
 
         Vector3 startCameraPos = mainCamera.transform.position;
@@ -348,5 +374,42 @@ public class GameManager : MonoBehaviour
     public void SetSfxVolume(float volume)
     {
         mainMixer.SetFloat("SfxVolume", Mathf.Log10(volume) * 20);
+    }
+
+    // --- NUEVA FUNCIÓN ---
+    private void SavePlayerScore()
+    {
+        // Creamos una nueva entrada con la puntuación de esta partida
+        ScoreEntry newEntry = new ScoreEntry();
+        newEntry.score = score;
+        // Recuperamos el nombre que guardamos en el menú principal
+        newEntry.playerName = PlayerPrefs.GetString("CurrentPlayerName", "Player");
+
+        // Cargamos los datos de ranking existentes
+        RankingsData rankings = SaveSystem.LoadRankings();
+        // Añadimos la nueva puntuación a la lista
+        rankings.scores.Add(newEntry);
+        // Guardamos la lista actualizada
+        SaveSystem.SaveRankings(rankings);
+
+        Debug.Log("Puntuación guardada: " + newEntry.playerName + " - " + newEntry.score);
+    }
+
+    // NUEVO: Esta corutina maneja la secuencia de fin de juego
+    IEnumerator GameOverSequence()
+    {
+        // 1. Ejecutamos la animación de la cámara y esperamos a que termine.
+        yield return StartCoroutine(ZoomOutOnGameOver());
+
+        // 2. Una vez terminada la animación, preparamos y mostramos el panel.
+        if (finalScoreText != null)
+        {
+            finalScoreText.text = "Score: " + score;
+        }
+
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(true);
+        }
     }
 }
