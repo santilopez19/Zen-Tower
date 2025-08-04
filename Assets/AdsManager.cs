@@ -23,10 +23,10 @@ public class AdsManager : MonoBehaviour
         
         #if UNITY_ANDROID
             // --- USA ESTE ID PARA PROBAR ---
-            string adUnitId = "ca-app-pub-3940256099942544/6300978111"; 
+            //string adUnitId = "ca-app-pub-3940256099942544/6300978111"; 
             
             // --- USA TU ID REAL SOLO CUANDO VAYAS A PUBLICAR ---
-            // string adUnitId = "ca-app-pub-xxxxxxxxxxxxxxxx/yyyyyyyyyy"; // <-- ¡Aquí va tu ID real!
+            string adUnitId = "ca-app-pub-2209542523225727/4961135252"; // <-- ¡Aquí va tu ID real!
         #else
             string adUnitId = "unexpected_platform";
         #endif

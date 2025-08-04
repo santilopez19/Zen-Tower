@@ -90,17 +90,22 @@ public class MainMenuController : MonoBehaviour
             Destroy(child.gameObject);
         }
 
+       
         RankingsData data = SaveSystem.LoadRankings();
-
-        // Ordenamos la lista de mayor a menor puntuación
+        
+        
+        Debug.Log("Cargadas " + data.scores.Count + " puntuaciones.");
+        
         var sortedScores = data.scores.OrderByDescending(s => s.score).ToList();
 
-        // Creamos una fila en la UI por cada puntuación guardada
         foreach (var entry in sortedScores)
         {
             GameObject newEntry = Instantiate(scoreEntryPrefab, contentParent);
             newEntry.transform.Find("NameText").GetComponent<TextMeshProUGUI>().text = entry.playerName;
             newEntry.transform.Find("ScoreText").GetComponent<TextMeshProUGUI>().text = entry.score.ToString();
+            
+            // NUEVO: Buscamos el objeto DateTimeText y le asignamos la fecha guardada
+            newEntry.transform.Find("DateTimeText").GetComponent<TextMeshProUGUI>().text = entry.dateTimeString;
         }
 
         ShowPanel(rankingsPanel);

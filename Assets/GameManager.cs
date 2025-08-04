@@ -49,12 +49,15 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Slider musicSlider;
     [SerializeField] private Slider sfxSlider;
 
+    [Header("Efectos Visuales")]
+    [SerializeField] private GameObject perfectPlacementEffect;
+
     // VARIABLES PRIVADAS (Para uso interno del script)
     private GameObject currentBlock;    // El bloque que el jugador está controlando actualmente.
     private bool blockIsMoving = false; // Flag para saber si un bloque está en movimiento.
     private bool gameOver = false;      // Flag para detener el juego.
     private float currentMoveSpeed;     // La velocidad del bloque actual.
-    private float moveLimit = 4.5f;     // Hasta dónde se moverá el bloque en el eje X.
+    private float moveLimit = 2f;     // Hasta dónde se moverá el bloque en el eje X.
     
         // NUEVO: Variables para la lógica de sonido y cámara
     private AudioSource audioSource;
@@ -219,14 +222,30 @@ public class GameManager : MonoBehaviour
         if (absoluteOffset < 0.05f)
         {
             score += 5;
-            Debug.Log("¡Perfecto! Puntuación: " + score);
             // NUEVO: Reproducimos el sonido de colocación perfecta.
             if (perfectSound != null) sfxSource.PlayOneShot(perfectSound);
+
+            if (perfectPlacementEffect != null)
+                {
+                    // 1. Creamos una instancia del efecto en la posición del bloque actual
+                    GameObject effectInstance = Instantiate(perfectPlacementEffect, currentBlock.transform.position, Quaternion.identity);
+
+                    // 2. Obtenemos el módulo "Shape" del sistema de partículas recién creado
+                    var shapeModule = effectInstance.GetComponent<ParticleSystem>().shape;
+
+                    // 3. Ajustamos la escala del emisor para que coincida con el tamaño del bloque actual
+                    shapeModule.scale = currentBlock.transform.localScale;
+
+                    // 4. Destruimos el objeto del efecto después de 1.5 segundos para darle tiempo a terminar
+                    Destroy(effectInstance, 1.5f);
+                }
+
+            // NUEVO: Actualizamos el texto del puntaje.
+            UpdateScoreText();
         }
         else
         {
             score += 1;
-            Debug.Log("Puntuación: " + score);
             // NUEVO: Reproducimos el sonido de colocación normal.
             if (placeSound != null) sfxSource.PlayOneShot(placeSound);
         }
@@ -375,24 +394,26 @@ public class GameManager : MonoBehaviour
     {
         mainMixer.SetFloat("SfxVolume", Mathf.Log10(volume) * 20);
     }
-
-    // --- NUEVA FUNCIÓN ---
     private void SavePlayerScore()
     {
         // Creamos una nueva entrada con la puntuación de esta partida
         ScoreEntry newEntry = new ScoreEntry();
         newEntry.score = score;
-        // Recuperamos el nombre que guardamos en el menú principal
         newEntry.playerName = PlayerPrefs.GetString("CurrentPlayerName", "Player");
+        
+        // Obtenemos la fecha y hora actual y la guardamos en un formato legible
+        newEntry.dateTimeString = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm");
 
         // Cargamos los datos de ranking existentes
         RankingsData rankings = SaveSystem.LoadRankings();
+        
         // Añadimos la nueva puntuación a la lista
         rankings.scores.Add(newEntry);
+        
         // Guardamos la lista actualizada
         SaveSystem.SaveRankings(rankings);
 
-        Debug.Log("Puntuación guardada: " + newEntry.playerName + " - " + newEntry.score);
+        Debug.Log("Puntuación guardada: " + newEntry.playerName + " - " + newEntry.score + " en " + newEntry.dateTimeString);
     }
 
     // NUEVO: Esta corutina maneja la secuencia de fin de juego

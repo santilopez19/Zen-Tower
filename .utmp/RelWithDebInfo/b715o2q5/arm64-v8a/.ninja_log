@@ -1,0 +1,23 @@
+# ninja log v5
+16	3608	7758898066019704	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	109956bec60725e4
+69	656	7758898036293413	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	183b91831294e874
+656	1052	7758898040023475	C:/Users/Santi/Zen Tower/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/b715o2q5/obj/arm64-v8a/libswappywrapper.so	329b15bbe135f374
+27	3127	7758898061088464	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	a2675fefd8361bc
+59	3666	7758898066606215	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	f42b3fdcb6c3e1b5
+50	3092	7758898060457318	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	7e47c6303c88cc1b
+11	3060	7758898060364670	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	6dada9f9da721643
+34	3125	7758898060938475	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	691c276227822ba7
+22	3237	7758898062266241	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	343c47bfbb7f0269
+42	3508	7758898064956660	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	426ec6834a819dba
+3667	3762	7758898067602368	C:/Users/Santi/Zen Tower/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/b715o2q5/obj/arm64-v8a/libgame.so	c451e80740f4e261
+84	1087	7759739690523586	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	183b91831294e874
+1088	1852	7759739697548196	C:/Users/Santi/Zen Tower/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/b715o2q5/obj/arm64-v8a/libswappywrapper.so	329b15bbe135f374
+55	5232	7759739732161371	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	7e47c6303c88cc1b
+35	5281	7759739731897405	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	6dada9f9da721643
+22	5319	7759739732902144	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	a2675fefd8361bc
+43	5326	7759739733043193	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	691c276227822ba7
+29	5405	7759739733987557	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	343c47bfbb7f0269
+64	5953	7759739739438568	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	426ec6834a819dba
+15	6072	7759739740634559	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	109956bec60725e4
+75	6145	7759739741378031	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	f42b3fdcb6c3e1b5
+6145	6253	7759739742535501	C:/Users/Santi/Zen Tower/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/b715o2q5/obj/arm64-v8a/libgame.so	c451e80740f4e261
